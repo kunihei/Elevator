@@ -1,10 +1,22 @@
 import UIKit
 
+enum ElevatorFloor: Int {
+    case one = 1
+    case two = 2
+    case three = 3
+    case four = 4
+    case five = 5
+    case six = 6
+    case seven = 7
+    case eight = 8
+}
+
 class VirtualElevator{
-    var building = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    var callButton = 2
-    var currentFloor = 6
+    
+    var callButton = ElevatorFloor.eight.rawValue
+    var currentFloor = ElevatorFloor.four.rawValue
     var closeCount = 0
+    var elevatorFloorButton = ElevatorFloor.three
     var callTimer:Timer = Timer()
     var closeTimer:Timer = Timer()
     
@@ -12,16 +24,21 @@ class VirtualElevator{
     func elevatorCall() {
         if callButton != currentFloor {
             print("現在呼び出しています！")
-            callTimer = Timer.scheduledTimer(timeInterval: 0.9, target:self, selector:#selector(callCountDown), userInfo:nil, repeats:true)
+            print(currentFloor)
+            callTimer = Timer.scheduledTimer(timeInterval: 1.5, target:self, selector:#selector(floorCount), userInfo:nil, repeats:true)
         } else {
             print("扉が開きます！")
             closeDoor()
         }
     }
     
-    @objc func callCountDown(){
+    @objc func floorCount(){
+        if callButton < currentFloor {
+            currentFloor -= 1
+        } else {
+            currentFloor += 1
+        }
         print(currentFloor)
-        currentFloor -= 1
         if callButton == currentFloor {
             print("扉が開きます！")
             callTimer.invalidate()
@@ -29,8 +46,9 @@ class VirtualElevator{
         }
     }
     
+    //扉が開いてから一定時間すぎると自動で閉まるメソッド
     func closeDoor(){
-        closeTimer = Timer.scheduledTimer(timeInterval: 0.9, target:self, selector:#selector(closeDoorCountUp), userInfo:nil, repeats:true)
+        closeTimer = Timer.scheduledTimer(timeInterval: 1, target:self, selector:#selector(closeDoorCountUp), userInfo:nil, repeats:true)
         
     }
     
