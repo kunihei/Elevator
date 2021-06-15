@@ -13,10 +13,10 @@ enum ElevatorFloor: Int {
 
 class VirtualElevator{
     
-    var callButton = ElevatorFloor.eight.rawValue
+    var callButton = ElevatorFloor.one.rawValue
     var currentFloor = ElevatorFloor.four.rawValue
-    var closeCount = 0
-    var elevatorFloorButton = ElevatorFloor.three
+    var closeDoorCount = 0
+    var elevatorFloorButton = Int()
     var callTimer:Timer = Timer()
     var closeTimer:Timer = Timer()
     
@@ -25,15 +25,19 @@ class VirtualElevator{
         if callButton != currentFloor {
             print("現在呼び出しています！")
             print(currentFloor)
-            callTimer = Timer.scheduledTimer(timeInterval: 1.5, target:self, selector:#selector(floorCount), userInfo:nil, repeats:true)
+            callTime()
         } else {
             print("扉が開きます！")
-            closeDoor()
+            closeDoorTime()
         }
     }
     
+    func callTime() {
+        callTimer = Timer.scheduledTimer(timeInterval: 1.5, target:self, selector:#selector(floorCount), userInfo:nil, repeats:true)
+    }
+    
     @objc func floorCount(){
-        if callButton < currentFloor {
+        if callButton < currentFloor || elevatorFloorButton < currentFloor {
             currentFloor -= 1
         } else {
             currentFloor += 1
@@ -42,22 +46,28 @@ class VirtualElevator{
         if callButton == currentFloor {
             print("扉が開きます！")
             callTimer.invalidate()
-            closeDoor()
+            closeDoorTime()
         }
     }
     
     //扉が開いてから一定時間すぎると自動で閉まるメソッド
-    func closeDoor(){
+    func closeDoorTime(){
         closeTimer = Timer.scheduledTimer(timeInterval: 1, target:self, selector:#selector(closeDoorCountUp), userInfo:nil, repeats:true)
         
     }
     
     @objc func closeDoorCountUp(){
-        closeCount += 1
-        if closeCount == 20 {
+        closeDoorCount += 1
+        if closeDoorCount == 20 {
             print("扉が閉まります！")
             closeTimer.invalidate()
         }
+    }
+    
+    func elevatorMoveFloor() {
+        elevatorFloorButton = ElevatorFloor.three.rawValue
+        
+        print("移動しています")
     }
     
 }
