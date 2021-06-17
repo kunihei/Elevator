@@ -15,10 +15,12 @@ class VirtualElevator{
     
     var callButton = ElevatorFloor.one.rawValue
     var currentFloor = ElevatorFloor.four.rawValue
+    var moveElevator = 0
     var closeDoorCount = 0
     var elevatorFloorButton = Int()
     var callTimer:Timer = Timer()
     var closeTimer:Timer = Timer()
+    var moveElevatorTimer:Timer = Timer()
     
     //エレベーターを呼び出し呼び出された階に移動させるメソッド
     func elevatorCall() {
@@ -37,15 +39,37 @@ class VirtualElevator{
     }
     
     @objc func floorCount(){
-        if callButton < currentFloor || elevatorFloorButton < currentFloor {
+        if callButton < currentFloor {
             currentFloor -= 1
         } else {
             currentFloor += 1
         }
         print(currentFloor)
         if callButton == currentFloor {
+            moveElevator = currentFloor
             print("扉が開きます！")
             callTimer.invalidate()
+            closeDoorTime()
+        }
+    }
+    
+    func moveElevatorTime() {
+        moveElevatorTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(moveCount), userInfo: nil, repeats: true)
+    }
+    
+    @objc func moveCount() {
+        if elevatorFloorButton < moveElevator {
+            currentFloor -= 1
+            moveElevator = currentFloor
+        } else {
+            currentFloor += 1
+            moveElevator = currentFloor
+        }
+        print(moveElevator)
+        if elevatorFloorButton == moveElevator {
+            moveElevator = currentFloor
+            print("扉が開きます！")
+            moveElevatorTimer.invalidate()
             closeDoorTime()
         }
     }
@@ -58,16 +82,22 @@ class VirtualElevator{
     
     @objc func closeDoorCountUp(){
         closeDoorCount += 1
-        if closeDoorCount == 20 {
+        if closeDoorCount == 10 {
+            closeDoorCount = 0
             print("扉が閉まります！")
             closeTimer.invalidate()
+            if elevatorFloorButton != moveElevator {
+                elevatorMoveFloor()
+            }
         }
     }
     
     func elevatorMoveFloor() {
+        moveElevator = currentFloor
+        print(moveElevator)
         elevatorFloorButton = ElevatorFloor.three.rawValue
+        moveElevatorTime()
         
-        print("移動しています")
     }
     
 }
