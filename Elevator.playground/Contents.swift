@@ -13,10 +13,13 @@ enum ElevatorFloor: Int {
 
 class VirtualElevator{
     
+    let peopleLimit = 4
+    
     var callButton = ElevatorFloor.one.rawValue
     var currentFloor = ElevatorFloor.four.rawValue
     var moveElevator = 0
     var closeDoorCount = 0
+    var human = 5
     var elevatorFloorButton = Int()
     var callTimer:Timer = Timer()
     var closeTimer:Timer = Timer()
@@ -82,6 +85,11 @@ class VirtualElevator{
     
     @objc func closeDoorCountUp(){
         closeDoorCount += 1
+        guard human <= peopleLimit else {
+            print("人数がオーバーしています‼︎")
+            closeTimer.invalidate()
+            return
+        }
         if closeDoorCount == 10 {
             closeDoorCount = 0
             print("扉が閉まります！")
