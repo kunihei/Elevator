@@ -14,6 +14,7 @@ enum ElevatorFloor: Int {
 class VirtualElevator{
     
     var callButton = ElevatorFloor.one.rawValue
+    var callButton2 = ElevatorFloor.three.rawValue
     var currentFloor = ElevatorFloor.four.rawValue
     var moveElevator = 0
     var closeDoorCount = 0
@@ -26,14 +27,18 @@ class VirtualElevator{
     func elevatorCall() {
         if callButton != currentFloor {
             
-            print("現在呼び出しています！")
-            print(currentFloor)
-            callTimer = Timer.scheduledTimer(timeInterval: 1.5, target:self, selector:#selector(floorCount), userInfo:nil, repeats:true)
+            elevatorMotion()
         } else {
             
             print("扉が開きます！")
             closeDoorTime()
         }
+    }
+    
+    func elevatorMotion() {
+        print("現在呼び出しています！")
+        print(currentFloor)
+        callTimer = Timer.scheduledTimer(timeInterval: 1.5, target:self, selector:#selector(floorCount), userInfo:nil, repeats:true)
     }
     
     @objc func floorCount(){
@@ -74,18 +79,21 @@ class VirtualElevator{
             return
         }
         
-        if closeDoorCount == 5 || stuff == 0 {
-            
-            closeDoorCount = 0
-            print("扉が閉まります！")
-            closeTimer.invalidate()
-            
-            if elevatorFloorButton != moveElevator {
-                elevatorMoveFloor()
+        if closeDoorCount == 5 {
+            if stuff == 0 {
+                
+                closeDoorCount = 0
+                print("扉が閉まります！")
+                closeTimer.invalidate()
+                
+                if elevatorFloorButton != moveElevator {
+                    elevatorMoveFloor()
+                }
+            } else {
+                
+                print("物が挟まっています！")
+                closeDoorCount = 3
             }
-        } else {
-            print("物が挟まっています！")
-            closeDoorCount = 3
         }
     }
     
