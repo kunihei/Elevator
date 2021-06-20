@@ -13,60 +13,27 @@ enum ElevatorFloor: Int {
 
 class VirtualElevator{
     
-    var callButton = ElevatorFloor.one.rawValue
-    var callButton2 = ElevatorFloor.three.rawValue
+    var callButton = ElevatorFloor.five.rawValue
     var currentFloor = ElevatorFloor.four.rawValue
-    var moveElevator = 0
     var closeDoorCount = 0
-    var elevatorFloorButton = Int()
+    var elevatorFloorButton = ElevatorFloor.one.rawValue
     var callTimer:Timer = Timer()
     var closeTimer:Timer = Timer()
     var moveElevatorTimer:Timer = Timer()
     
-    //エレベーターを呼び出し呼び出された階に移動させるメソッド
-    func elevatorCall() {
-        if callButton != currentFloor {
-            
-            elevatorMotion()
-        } else {
-            
-            print("扉が開きます！")
-            closeDoorTime()
-        }
-    }
-    
-    func elevatorMotion() {
-        print("現在呼び出しています！")
+    //現在のエレベーターの階を表示するメソッド
+    func elevatorFloorDisplay() {
         print(currentFloor)
-        callTimer = Timer.scheduledTimer(timeInterval: 1.5, target:self, selector:#selector(floorCount), userInfo:nil, repeats:true)
     }
     
-    @objc func floorCount(){
-        
-        if callButton < currentFloor {
-            currentFloor -= 1
-        } else {
-            currentFloor += 1
-        }
-        
-        print(currentFloor)
-        
-        if callButton == currentFloor {
-            
-            moveElevator = currentFloor
-            print("扉が開きます！")
-            callTimer.invalidate()
-            closeDoorTime()
-        }
-    }
-    
-    //扉が開いてから一定時間すぎると自動で閉まるメソッド
-    func closeDoorTime(){
-        
+    //到着した際に扉が開き閉じるメソッド
+    func elevatorArrival() {
+        print("扉が開きます！")
         closeTimer = Timer.scheduledTimer(timeInterval: 1, target:self, selector:#selector(closeDoorCountUp), userInfo:nil, repeats:true)
     }
     
     @objc func closeDoorCountUp(){
+        
         let human = 4
         let peopleLimit = 4
         let stuff = 0
@@ -78,7 +45,7 @@ class VirtualElevator{
             closeTimer.invalidate()
             return
         }
-        
+
         if closeDoorCount == 5 {
             if stuff == 0 {
                 
@@ -86,45 +53,73 @@ class VirtualElevator{
                 print("扉が閉まります！")
                 closeTimer.invalidate()
                 
-                if elevatorFloorButton != moveElevator {
+                if elevatorFloorButton != currentFloor {
                     elevatorMoveFloor()
                 }
             } else {
                 
-                print("物が挟まっています！")
+                print("再度開きます")
                 closeDoorCount = 3
             }
         }
     }
     
-    //乗り込んで
+    //エレベーターを呼び出し呼び出された階に移動させるメソッド
+    func elevatorCall() {
+        if callButton != currentFloor {
+            
+            print("現在呼び出しています！")
+            elevatorFloorDisplay()
+            callTimer = Timer.scheduledTimer(timeInterval: 1.5, target:self, selector:#selector(floorCount), userInfo:nil, repeats:true)
+        } else {
+            
+            elevatorArrival()
+        }
+    }
+    
+    @objc func floorCount(){
+        
+        if callButton < currentFloor {
+            currentFloor -= 1
+        } else {
+            currentFloor += 1
+        }
+        
+        elevatorFloorDisplay()
+        
+        if callButton == currentFloor {
+            
+            elevatorArrival()
+            callTimer.invalidate()
+        }
+    }
+    
+    //乗り込んでから移動するメソッド
     func elevatorMoveFloor() {
         
-        moveElevator = currentFloor
-        print(moveElevator)
-        elevatorFloorButton = ElevatorFloor.three.rawValue
-        moveElevatorTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(moveCount), userInfo: nil, repeats: true)
+        
+        if elevatorFloorButton != currentFloor {
+            
+            elevatorFloorDisplay()
+            moveElevatorTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(moveCount), userInfo: nil, repeats: true)
+        }
     }
     
     @objc func moveCount() {
-        if elevatorFloorButton < moveElevator {
+        if elevatorFloorButton < currentFloor {
             
             currentFloor -= 1
-            moveElevator = currentFloor
         } else {
             
             currentFloor += 1
-            moveElevator = currentFloor
         }
         
-        print(moveElevator)
+        elevatorFloorDisplay()
         
-        if elevatorFloorButton == moveElevator {
+        if elevatorFloorButton == currentFloor {
             
-            moveElevator = currentFloor
-            print("扉が開きます！")
+            elevatorArrival()
             moveElevatorTimer.invalidate()
-            closeDoorTime()
         }
     }
 }
